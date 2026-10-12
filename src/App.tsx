@@ -104,10 +104,10 @@ function Icon({
   const paths: Record<IconName, ReactNode> = {
     walk: (
       <>
-        <circle cx="12" cy="5" r="2.5" />
-        <path d="m10 22 1.5-6 2.5-3 2 3 4 1" />
-        <path d="m8 12 3.5-3 3.5 2 3-1" />
-        <path d="m14 13-3 3-4 5" />
+        <circle cx="13" cy="4" r="2" />
+        <path d="m12.5 9-1.5 5.5" />
+        <path d="m8.5 13 3.8-3 3.2 3" />
+        <path d="m7.5 21.5 2.5-4 1-3 3 3 .5 4" />
       </>
     ),
     volume: (
