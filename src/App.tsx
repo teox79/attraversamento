@@ -869,6 +869,7 @@ function HomePage({
   const [notifiedVolunteerCount, setNotifiedVolunteerCount] = useState<number | null>(null)
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [scanError, setScanError] = useState("")
+  const directQrValue = new URLSearchParams(window.location.search).get("qr_token")
   const handleScan = useCallback(async (value: string) => {
     setScannerOpen(false)
     setScanError("")
@@ -886,6 +887,10 @@ function HomePage({
       setLookingUpAlley(false)
     }
   }, [])
+
+  useEffect(() => {
+    if (directQrValue) void handleScan(directQrValue)
+  }, [directQrValue, handleScan])
 
   const submitCrossingRequest = async () => {
     if (!selectedAlley) return
@@ -930,6 +935,8 @@ function HomePage({
               status={requestStatus}
               notifiedVolunteerCount={notifiedVolunteerCount}
             />
+          ) : lookingUpAlley ? (
+            <p role="status">Apro il vicolo…</p>
           ) : selectedAlley ? (
             <>
               <VicoloHeader name={selectedAlley.name} />
@@ -944,7 +951,12 @@ function HomePage({
               <button
                 className="read-button"
                 type="button"
-                onClick={() => setSelectedAlley(null)}
+                onClick={() => {
+                  setSelectedAlley(null)
+                  const url = new URL(window.location.href)
+                  url.searchParams.delete("qr_token")
+                  window.history.replaceState({}, "", url)
+                }}
               >
                 Scansiona un altro vicolo
               </button>
@@ -989,7 +1001,13 @@ function HomePage({
         </>
       ) : (
         <>
-          <p>Apri una delle aree del servizio.</p>
+          <p>
+            {directQrValue && selectedAlley
+              ? `${selectedAlley.name} pronto. Scegli “Persona anziana” per continuare.`
+              : directQrValue && lookingUpAlley
+                ? "Cerco il vicolo del QR…"
+                : "Apri una delle aree del servizio."}
+          </p>
           <nav className="route-list" aria-label="Pagine disponibili">
             <button
               type="button"
@@ -1194,7 +1212,12 @@ export default function App() {
     try {
       await registerDevice(role)
       setRegisteredRole(role)
-      window.location.assign(destination)
+      const target = new URL(destination, window.location.origin)
+      const qrToken = new URLSearchParams(window.location.search).get("qr_token")
+      if (role === "anziano" && qrToken) {
+        target.searchParams.set("qr_token", qrToken)
+      }
+      window.location.assign(target.href)
     } catch (error) {
       setRegistrationError(
         error instanceof Error
