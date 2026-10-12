@@ -643,6 +643,114 @@ tbody tr:last-child td {
   font-weight: 700;
 }
 
+.pwa-install-button {
+  position: fixed;
+  right: max(16px, env(safe-area-inset-right));
+  bottom: max(16px, env(safe-area-inset-bottom));
+  z-index: 8;
+  min-height: 56px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 18px;
+  border: 3px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-primary);
+  box-shadow: 4px 4px 0 var(--color-border);
+  color: white;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pwa-install-button svg {
+  width: 24px;
+  height: 24px;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.pwa-install-button:hover {
+  background: var(--color-primary-dark);
+}
+
+.pwa-help-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  overflow-y: auto;
+  padding: max(20px, env(safe-area-inset-top)) 20px
+    max(20px, env(safe-area-inset-bottom));
+  background: rgb(26 26 26 / 74%);
+}
+
+.pwa-help {
+  position: relative;
+  width: min(560px, 100%);
+  max-height: 100%;
+  overflow-y: auto;
+  padding: var(--space-4);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-card);
+  background: var(--color-background);
+  box-shadow: var(--shadow-card);
+}
+
+.pwa-help__close {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  width: 48px;
+  height: 48px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--color-surface);
+  font-size: 36px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.pwa-help__icon {
+  width: 80px;
+  height: 80px;
+  display: grid;
+  place-items: center;
+  margin-bottom: var(--space-3);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: 24px;
+  background: var(--color-primary);
+  color: white;
+}
+
+.pwa-help .eyebrow {
+  color: var(--color-primary-dark);
+}
+
+.pwa-help h2 {
+  padding-right: 32px;
+  font-size: 32px;
+}
+
+.pwa-help ol {
+  display: grid;
+  gap: var(--space-2);
+  margin: var(--space-3) 0 var(--space-4);
+  padding-left: 30px;
+}
+
+.pwa-help li {
+  padding-left: 4px;
+}
+
+.pwa-help .big-button {
+  width: 100%;
+}
+
 @media (min-width: 760px) {
   .elder-page {
     padding: var(--space-4);

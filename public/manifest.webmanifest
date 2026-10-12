@@ -1,0 +1,26 @@
+{
+  "id": "/",
+  "name": "Passo Sicuro",
+  "short_name": "Passo Sicuro",
+  "description": "Un aiuto sicuro per attraversare la strada.",
+  "lang": "it-IT",
+  "start_url": "/v/vicolo-dei-gatti",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#fffdf7",
+  "theme_color": "#0b5fff",
+  "icons": [
+    {
+      "src": "/icons/passo-sicuro-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/passo-sicuro-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

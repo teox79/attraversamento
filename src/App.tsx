@@ -646,10 +646,138 @@ function NotFoundPage() {
   )
 }
 
+type InstallPromptEvent = Event & {
+  prompt: () => Promise<void>
+  userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>
+}
+
+function PwaInstallControl() {
+  const [installPrompt, setInstallPrompt] = useState<InstallPromptEvent | null>(
+    null,
+  )
+  const [showHelp, setShowHelp] = useState(false)
+  const [isInstalled, setIsInstalled] = useState(false)
+  const isIos =
+    /iphone|ipad|ipod/i.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
+
+  useEffect(() => {
+    const standalone =
+      window.matchMedia("(display-mode: standalone)").matches ||
+      (navigator as Navigator & { standalone?: boolean }).standalone === true
+    setIsInstalled(standalone)
+
+    const onInstallPrompt = (event: Event) => {
+      event.preventDefault()
+      setInstallPrompt(event as InstallPromptEvent)
+    }
+    const onInstalled = () => setIsInstalled(true)
+
+    window.addEventListener("beforeinstallprompt", onInstallPrompt)
+    window.addEventListener("appinstalled", onInstalled)
+    return () => {
+      window.removeEventListener("beforeinstallprompt", onInstallPrompt)
+      window.removeEventListener("appinstalled", onInstalled)
+    }
+  }, [])
+
+  const installOrExplain = async () => {
+    if (isIos || !installPrompt) {
+      setShowHelp(true)
+      return
+    }
+
+    await installPrompt.prompt()
+    const choice = await installPrompt.userChoice
+    setInstallPrompt(null)
+    if (choice.outcome === "accepted") setIsInstalled(true)
+    else setShowHelp(true)
+  }
+
+  if (isInstalled) return null
+
+  return (
+    <>
+      <button
+        className="pwa-install-button"
+        type="button"
+        onClick={installOrExplain}
+        aria-haspopup="dialog"
+      >
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
+          <path d="M12 3v12m0 0 4-4m-4 4-4-4M5 17v3h14v-3" />
+        </svg>
+        <span>Installa l’app</span>
+      </button>
+
+      {showHelp && (
+        <div
+          className="pwa-help-backdrop"
+          role="presentation"
+          onClick={(event) => {
+            if (event.target === event.currentTarget) setShowHelp(false)
+          }}
+        >
+          <section
+            className="pwa-help"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="pwa-help-title"
+          >
+            <button
+              className="pwa-help__close"
+              type="button"
+              onClick={() => setShowHelp(false)}
+              aria-label="Chiudi istruzioni"
+            >
+              ×
+            </button>
+            <div className="pwa-help__icon" aria-hidden="true">
+              <Icon name="shield" size="large" />
+            </div>
+            <p className="eyebrow">Passo Sicuro sul tuo telefono</p>
+            <h2 id="pwa-help-title">
+              {isIos ? "Aggiungila alla schermata Home" : "Installa Passo Sicuro"}
+            </h2>
+            {isIos ? (
+              <ol>
+                <li>Apri questa pagina in Safari.</li>
+                <li>Tocca il pulsante Condividi, il quadrato con la freccia.</li>
+                <li>Scegli “Aggiungi alla schermata Home”, poi tocca “Aggiungi”.</li>
+              </ol>
+            ) : (
+              <ol>
+                <li>Apri il menu del browser, ⋮ in alto a destra.</li>
+                <li>Tocca “Installa app” o “Aggiungi a schermata Home”.</li>
+                <li>Conferma con “Installa” o “Aggiungi”.</li>
+              </ol>
+            )}
+            <button
+              className="big-button big-button--primary"
+              type="button"
+              onClick={() => setShowHelp(false)}
+            >
+              Ho capito
+            </button>
+          </section>
+        </div>
+      )}
+    </>
+  )
+}
+
 export default function App() {
   const path = window.location.pathname
-  if (path.startsWith("/v/")) return <ElderPage />
-  if (path === "/angeli") return <VolunteersPage />
-  if (path === "/comune") return <MunicipalityPage />
-  return <NotFoundPage />
+  let page: ReactNode
+  if (path.startsWith("/v/")) page = <ElderPage />
+  else if (path === "/angeli") page = <VolunteersPage />
+  else if (path === "/comune") page = <MunicipalityPage />
+  else page = <NotFoundPage />
+
+  return (
+    <>
+      {page}
+      <PwaInstallControl />
+    </>
+  )
 }
