@@ -641,7 +641,7 @@ function NotFoundPage() {
         <a href={`${import.meta.env.BASE_URL}v/vicolo-dei-gatti`}>
           Persona anziana
         </a>
-        <a href={`${import.meta.env.BASE_URL}angeli`}>Volontari</a>
+        <a href={`${import.meta.env.BASE_URL}volontari`}>Volontari</a>
         <a href={`${import.meta.env.BASE_URL}comune`}>Comune</a>
       </nav>
     </main>
@@ -776,7 +776,7 @@ export default function App() {
   )
   let page: ReactNode
   if (path.startsWith("/v/")) page = <ElderPage />
-  else if (path === "/angeli") page = <VolunteersPage />
+  else if (path === "/volontari") page = <VolunteersPage />
   else if (path === "/comune") page = <MunicipalityPage />
   else page = <NotFoundPage />
 

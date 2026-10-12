@@ -95,7 +95,7 @@ Il routing è fatto a mano in `App` leggendo `window.location.pathname`:
 | Percorso | Pagina | Contenuto |
 |---|---|---|
 | `/v/<vicolo>` | `ElderPage` (anziano) | Nome del vicolo, pulsante «Voglio attraversare» con conferma, stato della richiesta, «Leggi ad alta voce», link «Segnala un pericolo» |
-| `/angeli` | `VolunteersPage` (volontari) | Richieste in attesa ordinate per tempo di attesa, pulsante «Arrivo io», poi «Attraversamento completato» |
+| `/volontari` | `VolunteersPage` (volontari) | Richieste in attesa ordinate per tempo di attesa, pulsante «Arrivo io», poi «Attraversamento completato» |
 | `/comune` | `MunicipalityPage` (Comune) | Indicatori del giorno e tabella dei vicoli più a rischio |
 | altro | `NotFoundPage` | Link alle tre aree |
 
