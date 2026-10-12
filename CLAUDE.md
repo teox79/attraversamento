@@ -113,7 +113,7 @@ Il routing è fatto a mano in `App` leggendo `window.location.pathname`:
 - «Segnala un pericolo» mostra solo un messaggio di conferma.
 - L'attraversamento lo chiude il volontario, non l'anziano.
 - Passi e Volontario del mese non sono implementati.
-- Nell'interfaccia il servizio si chiama ancora **Passo Sicuro**, che compare anche nelle chiavi di `localStorage`.
+- Le chiavi di `localStorage`, l'evento personalizzato, la cache del service worker e i file delle icone usano ancora il prefisso tecnico `passo-sicuro`.
 
 ## Linee guida
 

@@ -1,7 +1,7 @@
 {
   "id": "./",
-  "name": "Passo Sicuro",
-  "short_name": "Passo Sicuro",
+  "name": "AttraversiAMO",
+  "short_name": "AttraversiAMO",
   "description": "Un aiuto sicuro per attraversare la strada.",
   "lang": "it-IT",
   "start_url": "./v/vicolo-dei-gatti",

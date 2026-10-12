@@ -560,7 +560,7 @@ function MunicipalityPage() {
   return (
     <main className="page-shell dashboard">
       <TopBar
-        title="Passo Sicuro"
+        title="AttraversiAMO"
         action={<span className="admin-label">Comune · Oggi</span>}
       />
       <div className="content-shell">
@@ -668,7 +668,7 @@ function QrScanner({
 
     if (!navigator.mediaDevices?.getUserMedia) {
       setCameraError(
-        "La fotocamera non è disponibile. Apri Passo Sicuro con una connessione HTTPS o da localhost.",
+        "La fotocamera non è disponibile. Apri AttraversiAMO con una connessione HTTPS o da localhost.",
       )
       return
     }
@@ -735,7 +735,7 @@ function QrScanner({
         <div className="scanner-dialog__heading">
           <Camera aria-hidden="true" />
           <div>
-            <p className="eyebrow">Passo Sicuro</p>
+            <p className="eyebrow">AttraversiAMO</p>
             <h2 id="scanner-title">Inquadra il QR del vicolo</h2>
           </div>
         </div>
@@ -826,7 +826,7 @@ function HomePage({
   return (
     <main className="page-shell centered-page">
       <Icon name="shield" size="large" />
-      <h1>Passo Sicuro</h1>
+      <h1>AttraversiAMO</h1>
       {checkingRegistration ? (
         <p role="status">Controllo della registrazione…</p>
       ) : registeredRole === "anziano" ? (
@@ -1019,9 +1019,9 @@ function PwaInstallControl() {
             <div className="pwa-help__icon" aria-hidden="true">
               <Icon name="shield" size="large" />
             </div>
-            <p className="eyebrow">Passo Sicuro sul tuo telefono</p>
+            <p className="eyebrow">AttraversiAMO sul tuo telefono</p>
             <h2 id="pwa-help-title">
-              {isIos ? "Aggiungila alla schermata Home" : "Installa Passo Sicuro"}
+              {isIos ? "Aggiungila alla schermata Home" : "Installa AttraversiAMO"}
             </h2>
             {isIos ? (
               <ol>
