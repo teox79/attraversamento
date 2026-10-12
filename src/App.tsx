@@ -181,7 +181,7 @@ function BigButton({
   )
 }
 
-function TopBar({ title, action }: { title: string action?: ReactNode }) {
+function TopBar({ title, action }: { title: string; action?: ReactNode }) {
   return (
     <header className="top-bar">
       <div className="brand-mark" aria-hidden="true">
