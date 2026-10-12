@@ -16,6 +16,10 @@ import {
 type RequestStatus = "in_attesa" | "in_arrivo" | "completata"
 type IconName = "walk" | "volume" | "clock" | "person" | "check" | "warning" | "location" | "arrow" | "shield" | "chart"
 
+function appPath(path: string) {
+  return `${import.meta.env.BASE_URL}${path.replace(/^\/+/, "")}`
+}
+
 type CrossingRequest = {
   id: number
   vicolo: string
@@ -810,7 +814,7 @@ function HomePage({
           <button
             className="camera-button camera-button--volunteer"
             type="button"
-            onClick={() => window.location.assign("/angeli")}
+            onClick={() => window.location.assign(appPath("volontari"))}
           >
             <Icon name="person" size="large" />
             <span>Apri le richieste</span>
@@ -822,14 +826,18 @@ function HomePage({
           <nav className="route-list" aria-label="Pagine disponibili">
             <button
               type="button"
-              onClick={() => onSelectRole("anziano", "/v/vicolo-dei-gatti")}
+              onClick={() =>
+                onSelectRole("anziano", appPath("v/vicolo-dei-gatti"))
+              }
               disabled={registeringRole !== null}
             >
               {registeringRole === "anziano" ? "Registrazione…" : "Persona anziana"}
             </button>
             <button
               type="button"
-              onClick={() => onSelectRole("volontario", "/angeli")}
+              onClick={() =>
+                onSelectRole("volontario", appPath("volontari"))
+              }
               disabled={registeringRole !== null}
             >
               {registeringRole === "volontario" ? "Registrazione…" : "Volontari"}
@@ -837,7 +845,9 @@ function HomePage({
           </nav>
         </>
       )}
-      <a className="home-municipality-link" href="/comune">Comune</a>
+      <a className="home-municipality-link" href={appPath("comune")}>
+        Comune
+      </a>
       {registrationError && (
         <p className="registration-message" role="alert">
           {registrationError}
@@ -971,7 +981,11 @@ function PwaInstallControl() {
 }
 
 export default function App() {
-  const path = window.location.pathname
+  const basePath = import.meta.env.BASE_URL.replace(/\/$/, "")
+  const currentPath = window.location.pathname
+  const path = basePath && currentPath.startsWith(basePath)
+    ? currentPath.slice(basePath.length) || "/"
+    : currentPath
   const [registeringRole, setRegisteringRole] = useState<DeviceRole | null>(null)
   const [registrationError, setRegistrationError] = useState("")
   const [registeredRole, setRegisteredRole] = useState<DeviceRole | null>(null)
@@ -1020,7 +1034,7 @@ export default function App() {
 
   let page: ReactNode
   if (path.startsWith("/v/")) page = <ElderPage />
-  else if (path === "/angeli") page = <VolunteersPage />
+  else if (path === "/volontari") page = <VolunteersPage />
   else if (path === "/comune") page = <MunicipalityPage />
   else {
     page = (

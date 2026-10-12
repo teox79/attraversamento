@@ -1,10 +1,10 @@
 const CACHE_NAME = "passo-sicuro-v1"
 const APP_SHELL = [
-  "/",
-  "/manifest.webmanifest",
-  "/favicon.svg",
-  "/icons/passo-sicuro-192.png",
-  "/icons/passo-sicuro-512.png",
+  "./",
+  "manifest.webmanifest",
+  "favicon.svg",
+  "icons/passo-sicuro-192.png",
+  "icons/passo-sicuro-512.png",
 ]
 
 self.addEventListener("install", (event) => {
@@ -46,7 +46,7 @@ self.addEventListener("fetch", (event) => {
         })
         .catch(async () =>
           (await caches.match(request)) ||
-          (await caches.match("/")) ||
+          (await caches.match(new URL("./", self.location).href)) ||
           Response.error(),
         ),
     )
