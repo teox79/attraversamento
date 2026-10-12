@@ -201,7 +201,15 @@ function BigButton({
   )
 }
 
-function TopBar({ title, action }: { title: string; action?: ReactNode }) {
+function AppName() {
+  return (
+    <>
+      Attraversi<span className="app-name__accent">AMO</span>
+    </>
+  )
+}
+
+function TopBar({ title, action }: { title: ReactNode; action?: ReactNode }) {
   return (
     <header className="top-bar">
       <div className="brand-mark" aria-hidden="true">
@@ -560,7 +568,7 @@ function MunicipalityPage() {
   return (
     <main className="page-shell dashboard">
       <TopBar
-        title="AttraversiAMO"
+        title={<AppName />}
         action={<span className="admin-label">Comune · Oggi</span>}
       />
       <div className="content-shell">
@@ -826,7 +834,9 @@ function HomePage({
   return (
     <main className="page-shell centered-page">
       <Icon name="shield" size="large" />
-      <h1>AttraversiAMO</h1>
+      <h1>
+        <AppName />
+      </h1>
       {checkingRegistration ? (
         <p role="status">Controllo della registrazione…</p>
       ) : registeredRole === "anziano" ? (
