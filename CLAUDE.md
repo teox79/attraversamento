@@ -33,13 +33,13 @@ L'idea è trasformare un problema tecnologico in un problema di comunità: la te
 1. All'imbocco di ogni vicolo c'è un **cartello con un codice QR**: è l'unico costo di infrastruttura. Lo inquadra l'anziano, oppure un familiare o il farmacista lo salva una volta sola sul suo telefono.
 2. Si apre una pagina con **un solo grande pulsante: «Voglio attraversare»**. Non servono login né GPS, perché il vicolo è già indicato nel QR.
 3. La richiesta arriva in tempo reale ai **volontari** della zona: cittadini, negozianti e vigili. Uno di loro risponde «Arrivo».
-4. L'anziano vede lo stato con testo grande, colori e lettura vocale, ad esempio «Marco sta arrivando, aspetta qui».
+4. L'anziano vede lo stato con testo grande, colori e lettura vocale, ad esempio «Un volontario sta arrivando. Aspettalo qui».
 5. Arrivato dall'altra parte, l'anziano preme **«Sono dall'altra parte»**: l'attraversamento risulta completato.
 
 ### Due esperienze separate
 
 - **Anziano:** si apre solo dal QR, mostra solo il pulsante e lo stato, nessuna scelta da fare. L'anziano resta anonimo.
-- **Volontario:** riceve le richieste, risponde, vede i suoi punti e la classifica. Indica almeno il proprio nome.
+- **Volontario:** riceve le richieste, risponde, vede i suoi punti e la classifica. Non fornisce dati personali.
 
 Il Comune ha in più una **dashboard** con i risultati.
 
@@ -101,14 +101,13 @@ Il routing è fatto a mano in `App` leggendo `window.location.pathname`:
 
 ### Dati e stato
 
-- Le richieste di attraversamento (`CrossingRequest`: vicolo, minuti di attesa, stato `in_attesa` → `in_arrivo` → `completata`, volontario) stanno in `localStorage` con chiave `passo-sicuro-requests`.
+- Le richieste di attraversamento (`CrossingRequest`: vicolo, minuti di attesa, stato `in_attesa` → `in_arrivo` → `completata`) stanno in `localStorage` con chiave `passo-sicuro-requests`.
 - Le pagine si aggiornano tra loro con l'evento `storage` e con un evento personalizzato `passo-sicuro:update`: funziona tra schede dello **stesso browser**, non tra dispositivi diversi.
 - La lettura vocale usa la Web Speech API del browser (`speechSynthesis`, lingua `it-IT`, velocità ridotta).
 
 ### Limiti del prototipo
 
 - Il vicolo della pagina anziano è fisso («Vicolo dei Gatti»), anche se il percorso è `/v/<vicolo>`.
-- Il volontario che risponde è sempre «Marco».
 - I dati della dashboard del Comune e le richieste iniziali sono valori di esempio scritti nel codice.
 - «Segnala un pericolo» mostra solo un messaggio di conferma.
 - L'attraversamento lo chiude il volontario, non l'anziano.

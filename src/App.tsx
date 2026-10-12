@@ -29,7 +29,6 @@ type CrossingRequest = {
   vicolo: string
   minutes: number
   status: RequestStatus
-  volunteer?: string
 }
 
 const initialRequests: CrossingRequest[] = [
@@ -250,7 +249,7 @@ const statusContent: Record<RequestStatus, {
   in_arrivo: {
     icon: "person",
     label: "Aiuto in arrivo",
-    title: "Marco sta arrivando.",
+    title: "Un volontario sta arrivando.",
     subtitle: "Aspettalo qui.",
   },
   completata: {
@@ -496,7 +495,7 @@ function VolunteersPage() {
   )
 
   const accept = (request: CrossingRequest) => {
-    updateRequest(request.id, { status: "in_arrivo", volunteer: "Marco" })
+    updateRequest(request.id, { status: "in_arrivo" })
     setSelectedId(request.id)
   }
 
