@@ -63,6 +63,58 @@ I dati sono conteggi anonimi per vicolo.
 - Niente registrazione per l'anziano e niente GPS: si sa solo da quale vicolo parte la richiesta.
 - Le statistiche sono anonime.
 
+## Parte tecnica
+
+### Stack
+
+- **React 19** + **TypeScript** (strict), build e dev server con **Vite 8**.
+- **Tailwind CSS v4** tramite `@tailwindcss/vite`, ma lo stile è scritto quasi tutto in CSS puro: classi in stile BEM (`big-button--primary`, `status-card__icon`) e variabili CSS in `:root` dentro `src/index.css`.
+- Font **Atkinson Hyperlegible** (Google Fonts), scelto per la leggibilità da parte degli anziani.
+- Nessun backend e nessuna libreria di routing.
+- Il progetto nasce da **Figma Make**: `AGENTS.md`, i plugin `figma*` in `vite.config.ts` e i segnaposto `<!-- figma:... -->` in `index.html` servono a quell'ambiente e vanno lasciati com'è.
+
+### Comandi
+
+- Node 22 (`.nvmrc`, `.mise.toml`); come package manager è previsto pnpm (`.mise.toml`), ma nel repo ci sono sia `pnpm-lock.yaml` sia `package-lock.json`.
+- `dev`: avvia il dev server sulla porta `PORT`, di default **8443**.
+- `build` / `preview`: build di produzione e anteprima.
+- `format`: formattazione con oxfmt.
+
+### Struttura del codice
+
+- `src/main.tsx`: punto di ingresso, monta `App` e importa `src/index.css`.
+- `src/App.tsx`: tutta l'app in un unico file (componenti, dati di esempio, routing).
+- `src/index.css`: design token (colori, spaziature, raggi, bordi spessi con ombra piena) e stili di tutti i componenti, con breakpoint a 560, 760 e 1100 px e supporto a `prefers-reduced-motion`.
+- Alias `@` → `src/` (in `vite.config.ts` e `tsconfig.json`).
+- Convenzioni da `AGENTS.md`: componenti esportati come default; stringhe con apostrofo tra doppi apici.
+
+### Pagine
+
+Il routing è fatto a mano in `App` leggendo `window.location.pathname`:
+
+| Percorso | Pagina | Contenuto |
+|---|---|---|
+| `/v/<vicolo>` | `ElderPage` (anziano) | Nome del vicolo, pulsante «Voglio attraversare» con conferma, stato della richiesta, «Leggi ad alta voce», link «Segnala un pericolo» |
+| `/angeli` | `VolunteersPage` (Angeli) | Richieste in attesa ordinate per tempo di attesa, pulsante «Arrivo io», poi «Attraversamento completato» |
+| `/comune` | `MunicipalityPage` (Comune) | Indicatori del giorno e tabella dei vicoli più a rischio |
+| altro | `NotFoundPage` | Link alle tre aree |
+
+### Dati e stato
+
+- Le richieste di attraversamento (`CrossingRequest`: vicolo, minuti di attesa, stato `in_attesa` → `in_arrivo` → `completata`, volontario) stanno in `localStorage` con chiave `passo-sicuro-requests`.
+- Le pagine si aggiornano tra loro con l'evento `storage` e con un evento personalizzato `passo-sicuro:update`: funziona tra schede dello **stesso browser**, non tra dispositivi diversi.
+- La lettura vocale usa la Web Speech API del browser (`speechSynthesis`, lingua `it-IT`, velocità ridotta).
+
+### Limiti del prototipo
+
+- Il vicolo della pagina anziano è fisso («Vicolo dei Gatti»), anche se il percorso è `/v/<vicolo>`.
+- Il volontario che risponde è sempre «Marco».
+- I dati della dashboard del Comune e le richieste iniziali sono valori di esempio scritti nel codice.
+- «Segnala un pericolo» mostra solo un messaggio di conferma.
+- L'attraversamento lo chiude l'Angelo, non l'anziano.
+- Passi e Angelo del mese non sono implementati.
+- Nell'interfaccia il servizio si chiama ancora **Passo Sicuro**, che compare anche nelle chiavi di `localStorage`.
+
 ## Linee guida
 
 - **Tono:** civico e istituzionale. Niente giochi di parole sui gatti nonostante il nome del Comune.
@@ -70,5 +122,4 @@ I dati sono conteggi anonimi per vicolo.
 
 ## Materiali già pronti
 
-- `logo/`: logo in SVG (orizzontale, versione per sfondi scuri, verticale, icona app, solo simbolo). Il simbolo è un cuore fatto di strisce pedonali.
 - `depliant/depliant.html`: depliant A4 di due pagine da stampare, una per gli anziani e una per gli Angeli del vicolo.
