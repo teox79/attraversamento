@@ -19,3 +19,7 @@ logs/
 # beside it.
 /.plugins/
 /.opencode-skills/
+
+# Local OS and IDE files
+.DS_Store
+.idea/

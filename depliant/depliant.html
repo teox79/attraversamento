@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Attraversiamo – Depliant</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --accent: #0E5A47;
+    --accent-dark: #08382C;
+    --yellow: #F4C430;
+    --ink: #1B1B1B;
+    --muted: #3D3D3D;
+    --tint: #EAF3EF;
+    --paper: #FFFFFF;
+  }
+
+  @page { size: A4; margin: 0; }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    background: #D9D9D6;
+    color: var(--ink);
+    font-family: 'Atkinson Hyperlegible', sans-serif;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .page {
+    width: 210mm;
+    height: 297mm;
+    margin: 24px auto;
+    background: var(--paper);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  @media print {
+    html, body { background: var(--paper); }
+    .page { margin: 0; box-shadow: none; break-after: page; }
+    .page:last-child { break-after: auto; }
+  }
+
+  /* Zebra-crossing band */
+  .band {
+    height: 28px;
+    flex: 0 0 28px;
+    background: var(--ink);
+    display: flex;
+    gap: 26px;
+    padding: 0 56px;
+  }
+  .band span { width: 34px; background: var(--yellow); }
+
+  .content {
+    flex: 1;
+    padding: 40px 56px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  .eyebrow {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: var(--accent);
+  }
+
+  h1 {
+    margin: 0;
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--accent);
+    text-wrap: balance;
+  }
+  .title-xl { font-size: 86px; }
+  .title-l { font-size: 56px; line-height: 1.05; }
+
+  .tagline { font-size: 32px; font-weight: 700; line-height: 1.2; }
+
+  h2 { margin: 0; font-size: 26px; font-weight: 700; }
+
+  .lead { margin: 0; font-size: 20px; line-height: 1.5; text-wrap: pretty; }
+
+  .stack { display: flex; flex-direction: column; }
+  .gap-8 { gap: 8px; }
+  .gap-16 { gap: 16px; }
+  .gap-20 { gap: 20px; }
+
+  .num {
+    flex: 0 0 48px;
+    width: 48px;
+    height: 48px;
+    border-radius: 24px;
+    background: var(--yellow);
+    color: var(--ink);
+    font-size: 26px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .step { display: flex; gap: 16px; align-items: flex-start; }
+  .step-title { font-size: 22px; font-weight: 700; }
+  .step-text { font-size: 18px; line-height: 1.45; }
+
+  .how { display: flex; gap: 28px; align-items: flex-start; }
+
+  /* Phone mock-up */
+  .phone {
+    flex: 0 0 200px;
+    height: 390px;
+    border: 3px solid var(--ink);
+    border-radius: 30px;
+    padding: 18px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .phone-notch { width: 56px; height: 6px; border-radius: 3px; background: var(--ink); align-self: center; }
+  .phone-label { font-size: 13px; font-weight: 700; text-align: center; color: var(--muted); }
+  .phone-button {
+    flex: 1;
+    border-radius: 20px;
+    background: var(--accent);
+    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 12px;
+    font-size: 25px;
+    font-weight: 700;
+    line-height: 1.15;
+  }
+  .phone-hint { font-size: 13px; text-align: center; color: var(--muted); }
+
+  .box { border-radius: 14px; padding: 18px 22px; }
+  .box-tint { background: var(--tint); }
+  .box-title { font-size: 20px; font-weight: 700; color: var(--accent); }
+  .box-text { font-size: 17px; line-height: 1.45; }
+  .push-bottom { margin-top: auto; }
+
+  /* Page 2 */
+  .steps-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+  .steps-row .step { flex-direction: column; gap: 10px; }
+
+  .points {
+    background: var(--accent);
+    color: #FFFFFF;
+    border-radius: 16px;
+    padding: 24px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .points h2 { color: #FFFFFF; }
+  .points-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+  .points-figure { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 48px; line-height: 1; color: var(--yellow); }
+  .points-label { font-size: 18px; line-height: 1.4; }
+  .points-note { font-size: 16px; line-height: 1.45; }
+
+  .cta { display: flex; gap: 24px; align-items: center; border: 3px solid var(--ink); }
+  .qr {
+    flex: 0 0 112px;
+    height: 112px;
+    border: 2px dashed var(--muted);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 13px;
+    color: var(--muted);
+    padding: 8px;
+  }
+  .cta-title { font-size: 24px; font-weight: 700; }
+  .cta-text { font-size: 17px; line-height: 1.45; }
+</style>
+</head>
+<body>
+
+<!-- Page 1: for elderly residents -->
+<section class="page">
+  <div class="band" aria-hidden="true">
+    <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+  </div>
+  <div class="content">
+    <div class="stack gap-8">
+      <div class="eyebrow">COMUNE DI GATTAPELATA</div>
+      <h1 class="title-xl">Attraversiamo</h1>
+      <div class="tagline">Nessuno attraversa da solo.</div>
+    </div>
+
+    <p class="lead">Nei vicoli del centro storico attraversare può essere pericoloso. Con Attraversiamo basta un tocco sul telefono: una persona del quartiere arriva e ti accompagna dall'altra parte.</p>
+
+    <div class="stack gap-16">
+      <h2>Come funziona</h2>
+      <div class="how">
+        <div class="stack gap-20" style="flex: 1">
+          <div class="step">
+            <div class="num">1</div>
+            <div class="stack" style="gap: 4px">
+              <div class="step-title">Inquadra il cartello</div>
+              <div class="step-text">All'inizio di ogni vicolo c'è un cartello con un codice QR. Inquadralo con il telefono. Un familiare o il farmacista possono salvarlo per te una volta sola.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="num">2</div>
+            <div class="stack" style="gap: 4px">
+              <div class="step-title">Premi il pulsante</div>
+              <div class="step-text">Si apre una pagina con un solo grande pulsante: «Voglio attraversare». Niente password, niente registrazione.</div>
+            </div>
+          </div>
+          <div class="step">
+            <div class="num">3</div>
+            <div class="stack" style="gap: 4px">
+              <div class="step-title">Aspetta il tuo Angelo</div>
+              <div class="step-text">Il telefono ti dice, anche a voce, chi sta arrivando. Quando sei dall'altra parte premi «Sono dall'altra parte».</div>
+            </div>
+          </div>
+        </div>
+        <div class="phone" aria-hidden="true">
+          <div class="phone-notch"></div>
+          <div class="phone-label">Vicolo dei Fabbri</div>
+          <div class="phone-button">VOGLIO ATTRAVERSARE</div>
+          <div class="phone-hint">Tocca una volta</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="box box-tint stack gap-8 push-bottom">
+      <div class="box-title">La tua riservatezza è al sicuro</div>
+      <div class="box-text">Niente registrazione e niente GPS: l'app sa solo da quale vicolo parte la richiesta. Gli attraversamenti vengono contati in forma anonima, per capire quali vicoli rendere più sicuri.</div>
+    </div>
+  </div>
+</section>
+
+<!-- Page 2: for volunteers ("Angeli del vicolo") -->
+<section class="page">
+  <div class="band" aria-hidden="true">
+    <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+  </div>
+  <div class="content">
+    <div class="stack gap-8">
+      <div class="eyebrow">ATTRAVERSIAMO · PER CHI VUOLE AIUTARE</div>
+      <h1 class="title-l">Diventa un Angelo del vicolo</h1>
+    </div>
+
+    <p class="lead">Volontari, negozianti, vigili: chiunque viva o lavori nel centro storico può dare una mano. Bastano un telefono e qualche minuto.</p>
+
+    <div class="stack gap-16">
+      <h2>Come aiuti</h2>
+      <div class="steps-row">
+        <div class="step">
+          <div class="num">1</div>
+          <div class="step-title">Ricevi la richiesta</div>
+          <div class="step-text">Il telefono ti avvisa quando qualcuno vicino a te deve attraversare.</div>
+        </div>
+        <div class="step">
+          <div class="num">2</div>
+          <div class="step-title">Rispondi «Arrivo»</div>
+          <div class="step-text">La persona vede il tuo nome e sa che stai arrivando.</div>
+        </div>
+        <div class="step">
+          <div class="num">3</div>
+          <div class="step-title">Accompagnala</div>
+          <div class="step-text">Attraversate insieme, fino all'altra parte del vicolo.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="points">
+      <h2>Ogni aiuto vale Passi</h2>
+      <div class="points-row">
+        <div class="stack gap-8">
+          <div class="points-figure">10 Passi</div>
+          <div class="points-label">per ogni attraversamento completato</div>
+        </div>
+        <div class="stack gap-8">
+          <div class="points-figure">+5 Passi</div>
+          <div class="points-label">se arrivi entro 2 minuti</div>
+        </div>
+      </div>
+      <div class="points-note">I Passi vengono assegnati quando la persona accompagnata conferma di essere arrivata dall'altra parte.</div>
+    </div>
+
+    <div class="box box-tint stack gap-8">
+      <div class="box-title">Angelo del mese</div>
+      <div class="box-text">Ogni mese chi ha raccolto più Passi viene presentato sul sito e sui social del Comune di Gattapelata.</div>
+    </div>
+
+    <div class="box cta push-bottom">
+      <div class="qr">[QR iscrizione]</div>
+      <div class="stack gap-8">
+        <div class="cta-title">Iscriviti come Angelo del vicolo</div>
+        <div class="cta-text">Inquadra il codice o vai su [INDIRIZZO WEB]<br>Comune di Gattapelata · Piazza del Municipio 1</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>
