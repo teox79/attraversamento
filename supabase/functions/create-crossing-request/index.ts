@@ -117,7 +117,7 @@ Deno.serve(async (request) => {
               JSON.stringify({
                 title: "Nuova richiesta di aiuto",
                 body: "Una persona ha chiesto aiuto per attraversare. Apri Passo Sicuro.",
-                url: "/volontari",
+                url: "./volontari",
                 requestId: data.id,
               }),
               { TTL: 60 },

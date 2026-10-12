@@ -17,6 +17,9 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+      VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -24,6 +27,10 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
+      - name: Check Supabase frontend configuration
+        run: |
+          test -n "$VITE_SUPABASE_URL" || (echo "Set the VITE_SUPABASE_URL Actions variable" && exit 1)
+          test -n "$VITE_SUPABASE_PUBLISHABLE_KEY" || (echo "Set the VITE_SUPABASE_PUBLISHABLE_KEY Actions variable" && exit 1)
       - run: npx vite build --base=/attraversamento/
       # GitHub Pages serves 404.html for unknown paths, so deep links like /v/<alley> still load the app.
       - run: cp dist/index.html dist/404.html
