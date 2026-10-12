@@ -1154,6 +1154,12 @@ export default function App() {
   const path = basePath && currentPath.startsWith(basePath)
     ? currentPath.slice(basePath.length) || "/"
     : currentPath
+  const legacyLaunchPath = path.replace(/\/$/, "") === "/v/vicolo-dei-gatti"
+
+  useEffect(() => {
+    if (legacyLaunchPath) window.location.replace(appPath(""))
+  }, [legacyLaunchPath])
+
   const [registeringRole, setRegisteringRole] = useState<DeviceRole | null>(null)
   const [registrationError, setRegistrationError] = useState("")
   const [registeredRole, setRegisteredRole] = useState<DeviceRole | null>(null)
@@ -1201,7 +1207,8 @@ export default function App() {
   }
 
   let page: ReactNode
-  if (path.startsWith("/v/")) page = <ElderPage />
+  if (legacyLaunchPath) page = null
+  else if (path.startsWith("/v/")) page = <ElderPage />
   else if (path === "/volontari") page = <VolunteersPage />
   else if (path === "/comune") page = <MunicipalityPage />
   else {
