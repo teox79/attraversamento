@@ -1,4 +1,4 @@
-const CACHE_NAME = "passo-sicuro-v1"
+const CACHE_NAME = "passo-sicuro-v2"
 const APP_SHELL = [
   "./",
   "manifest.webmanifest",

@@ -4,7 +4,7 @@
   "short_name": "AttraversiAMO",
   "description": "Un aiuto sicuro per attraversare la strada.",
   "lang": "it-IT",
-  "start_url": "./v/vicolo-dei-gatti",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "background_color": "#fffdf7",
