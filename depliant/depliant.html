@@ -3,18 +3,29 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Attraversiamo – Depliant</title>
+<title>AttraversiAMO – Depliant</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
 <style>
+  /* Design tokens taken from the app (src/index.css) */
   :root {
-    --accent: #0E5A47;
-    --accent-dark: #08382C;
-    --yellow: #F4C430;
-    --ink: #1B1B1B;
-    --muted: #3D3D3D;
-    --tint: #EAF3EF;
-    --paper: #FFFFFF;
+    --color-background: #fffdf7;
+    --color-surface: #ffffff;
+    --color-text: #1a1a1a;
+    --color-primary: #0b5fff;
+    --color-primary-dark: #0746bd;
+    --color-primary-soft: #e8f0ff;
+    --color-success: #0a7d32;
+    --color-success-dark: #075b25;
+    --color-success-soft: #e5f5ea;
+    --color-waiting: #b45309;
+    --color-waiting-soft: #fff0dc;
+    --color-border: #1a1a1a;
+    --radius-card: 16px;
+    --radius-button: 24px;
+    --border-width: 3px;
+    --shadow-card: 8px 8px 0 #1a1a1a;
+    --shadow-button: 5px 5px 0 #1a1a1a;
   }
 
   @page { size: A4; margin: 0; }
@@ -23,9 +34,9 @@
 
   html, body {
     margin: 0;
-    background: #D9D9D6;
-    color: var(--ink);
-    font-family: 'Atkinson Hyperlegible', sans-serif;
+    background: #d9d9d6;
+    color: var(--color-text);
+    font-family: "Atkinson Hyperlegible", system-ui, sans-serif;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
@@ -34,7 +45,9 @@
     width: 210mm;
     height: 297mm;
     margin: 24px auto;
-    background: var(--paper);
+    background:
+      radial-gradient(circle at 8% 4%, var(--color-primary-soft) 0, transparent 26%),
+      var(--color-background);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -42,146 +55,248 @@
   }
 
   @media print {
-    html, body { background: var(--paper); }
+    html, body { background: var(--color-background); }
     .page { margin: 0; box-shadow: none; break-after: page; }
     .page:last-child { break-after: auto; }
   }
 
-  /* Zebra-crossing band */
-  .band {
-    height: 28px;
-    flex: 0 0 28px;
-    background: var(--ink);
+  .icon { width: 28px; height: 28px; flex: 0 0 auto; }
+  .icon--large { width: 44px; height: 44px; }
+
+  /* Top bar, as in the app */
+  .top-bar {
+    flex: 0 0 auto;
     display: flex;
-    gap: 26px;
-    padding: 0 56px;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 48px;
+    border-bottom: var(--border-width) solid var(--color-border);
+    background: var(--color-surface);
   }
-  .band span { width: 34px; background: var(--yellow); }
+  .brand-mark {
+    width: 56px;
+    height: 56px;
+    display: grid;
+    place-items: center;
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-card);
+    background: var(--color-primary);
+    color: var(--color-surface);
+  }
+  .brand-name { flex: 1; font-size: 30px; font-weight: 700; letter-spacing: -0.02em; }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+    padding: 6px 16px;
+    border: var(--border-width) solid var(--color-border);
+    border-radius: 999px;
+    background: var(--color-background);
+    font-size: 15px;
+    font-weight: 700;
+  }
 
   .content {
     flex: 1;
-    padding: 40px 56px 40px;
+    padding: 32px 48px 40px;
     display: flex;
     flex-direction: column;
-    gap: 22px;
+    gap: 24px;
   }
 
+  .content--compact { gap: 18px; padding-top: 26px; padding-bottom: 32px; }
+
   .eyebrow {
-    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
     font-weight: 700;
-    letter-spacing: 0.14em;
-    color: var(--accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-primary-dark);
   }
 
   h1 {
     margin: 0;
-    font-family: 'Bricolage Grotesque', sans-serif;
-    font-weight: 800;
-    line-height: 1;
-    letter-spacing: -0.02em;
-    color: var(--accent);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.025em;
     text-wrap: balance;
   }
-  .title-xl { font-size: 86px; }
-  .title-l { font-size: 56px; line-height: 1.05; }
+  .title-xl { font-size: 76px; }
+  .title-l { font-size: 46px; }
+  .title-xl .accent { color: var(--color-primary); }
 
-  .tagline { font-size: 32px; font-weight: 700; line-height: 1.2; }
+  .tagline { font-size: 30px; font-weight: 700; line-height: 1.2; }
 
-  h2 { margin: 0; font-size: 26px; font-weight: 700; }
+  h2 { margin: 0; font-size: 28px; line-height: 1.15; }
 
   .lead { margin: 0; font-size: 20px; line-height: 1.5; text-wrap: pretty; }
 
   .stack { display: flex; flex-direction: column; }
+  .gap-4 { gap: 4px; }
   .gap-8 { gap: 8px; }
   .gap-16 { gap: 16px; }
   .gap-20 { gap: 20px; }
 
+  /* Numbered steps, styled like the app's count badge */
   .num {
     flex: 0 0 48px;
     width: 48px;
     height: 48px;
-    border-radius: 24px;
-    background: var(--yellow);
-    color: var(--ink);
-    font-size: 26px;
+    display: grid;
+    place-items: center;
+    border: var(--border-width) solid var(--color-border);
+    border-radius: 50%;
+    background: var(--color-primary);
+    color: var(--color-surface);
+    font-size: 24px;
     font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
-
   .step { display: flex; gap: 16px; align-items: flex-start; }
   .step-title { font-size: 22px; font-weight: 700; }
   .step-text { font-size: 18px; line-height: 1.45; }
 
-  .how { display: flex; gap: 28px; align-items: flex-start; }
+  .how { display: flex; gap: 32px; align-items: flex-start; }
 
-  /* Phone mock-up */
+  /* Phone mock-up showing the elderly person's screen */
   .phone {
-    flex: 0 0 200px;
-    height: 390px;
-    border: 3px solid var(--ink);
-    border-radius: 30px;
-    padding: 18px 14px;
+    flex: 0 0 230px;
+    height: 420px;
+    border: var(--border-width) solid var(--color-border);
+    border-radius: 32px;
+    padding: 14px 14px 18px;
+    background: var(--color-background);
+    box-shadow: var(--shadow-card);
     display: flex;
     flex-direction: column;
     gap: 12px;
   }
-  .phone-notch { width: 56px; height: 6px; border-radius: 3px; background: var(--ink); align-self: center; }
-  .phone-label { font-size: 13px; font-weight: 700; text-align: center; color: var(--muted); }
+  .phone-notch { width: 56px; height: 6px; border-radius: 3px; background: var(--color-border); align-self: center; }
+  .phone-eyebrow { display: flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-primary-dark); }
+  .phone-eyebrow .icon { width: 16px; height: 16px; }
+  .phone-title { font-size: 22px; font-weight: 700; line-height: 1.1; }
   .phone-button {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+    border: var(--border-width) solid var(--color-border);
     border-radius: 20px;
-    background: var(--accent);
-    color: #FFFFFF;
+    background: var(--color-primary);
+    box-shadow: 4px 4px 0 var(--color-border);
+    color: var(--color-surface);
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.15;
+    text-align: center;
+  }
+  .phone-read {
     display: flex;
     align-items: center;
     justify-content: center;
-    text-align: center;
-    padding: 12px;
-    font-size: 25px;
+    gap: 6px;
+    min-height: 40px;
+    border: var(--border-width) solid var(--color-border);
+    border-radius: 12px;
+    background: var(--color-surface);
+    font-size: 13px;
     font-weight: 700;
-    line-height: 1.15;
   }
-  .phone-hint { font-size: 13px; text-align: center; color: var(--muted); }
+  .phone-read .icon { width: 18px; height: 18px; }
 
-  .box { border-radius: 14px; padding: 18px 22px; }
-  .box-tint { background: var(--tint); }
-  .box-title { font-size: 20px; font-weight: 700; color: var(--accent); }
-  .box-text { font-size: 17px; line-height: 1.45; }
+  /* Cards with a coloured left border, like the app's status cards */
+  .card {
+    padding: 20px 24px;
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+    display: flex;
+    gap: 18px;
+    align-items: flex-start;
+  }
+  .card--success { background: var(--color-success-soft); border-left: 16px solid var(--color-success); }
+  .card--waiting { background: var(--color-waiting-soft); border-left: 16px solid var(--color-waiting); }
+  .card-icon {
+    flex: 0 0 64px;
+    width: 64px;
+    height: 64px;
+    display: grid;
+    place-items: center;
+    border: var(--border-width) solid var(--color-border);
+    border-radius: 50%;
+    background: var(--color-surface);
+  }
+  .card-title { font-size: 21px; font-weight: 700; }
+  .card-text { font-size: 17px; line-height: 1.45; }
   .push-bottom { margin-top: auto; }
 
   /* Page 2 */
-  .steps-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
-  .steps-row .step { flex-direction: column; gap: 10px; }
-
-  .points {
-    background: var(--accent);
-    color: #FFFFFF;
-    border-radius: 16px;
-    padding: 24px 28px;
+  .steps-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+  .step-tile {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 10px;
+    padding: 16px;
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-card);
+    background: var(--color-surface);
   }
-  .points h2 { color: #FFFFFF; }
-  .points-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
-  .points-figure { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 48px; line-height: 1; color: var(--yellow); }
-  .points-label { font-size: 18px; line-height: 1.4; }
+
+  .step-head { display: flex; align-items: center; gap: 10px; }
+  .step-head .num { flex-basis: 40px; width: 40px; height: 40px; font-size: 20px; }
+  .step-tile .step-title { font-size: 18px; line-height: 1.2; min-width: 0; overflow-wrap: anywhere; }
+  .step-tile .step-text { font-size: 17px; }
+
+  .points {
+    padding: 18px 24px;
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-card);
+    background: var(--color-primary);
+    box-shadow: var(--shadow-card);
+    color: var(--color-surface);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .points-tile {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 12px 16px;
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-card);
+    background: var(--color-surface);
+    color: var(--color-text);
+  }
+  .points-figure { font-size: 36px; font-weight: 700; line-height: 1; letter-spacing: -0.04em; color: var(--color-primary-dark); }
+  .points-label { font-size: 18px; line-height: 1.4; font-weight: 700; }
   .points-note { font-size: 16px; line-height: 1.45; }
 
-  .cta { display: flex; gap: 24px; align-items: center; border: 3px solid var(--ink); }
+  .cta {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+    padding: 16px 24px;
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-card);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-card);
+  }
   .qr {
-    flex: 0 0 112px;
-    height: 112px;
-    border: 2px dashed var(--muted);
+    flex: 0 0 96px;
+    height: 96px;
+    border: 2px dashed var(--color-border);
     border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
     font-size: 13px;
-    color: var(--muted);
     padding: 8px;
   }
   .cta-title { font-size: 24px; font-weight: 700; }
@@ -190,19 +305,34 @@
 </head>
 <body>
 
+<!-- Icons, same paths as the app -->
+<svg width="0" height="0" style="position: absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5 3.5 9 8 11 4.5-2 8-6 8-11V5l-8-3Z" /><path d="m8 12 2.5 2.5L16 9" /></symbol>
+    <symbol id="i-walk" viewBox="0 0 24 24"><circle cx="12" cy="5" r="2.5" /><path d="m10 22 1.5-6 2.5-3 2 3 4 1" /><path d="m8 12 3.5-3 3.5 2 3-1" /><path d="m14 13-3 3-4 5" /></symbol>
+    <symbol id="i-volume" viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4V5Z" /><path d="M15 9a4 4 0 0 1 0 6M18 6a8 8 0 0 1 0 12" /></symbol>
+    <symbol id="i-location" viewBox="0 0 24 24"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z" /><circle cx="12" cy="10" r="2.5" /></symbol>
+    <symbol id="i-person" viewBox="0 0 24 24"><circle cx="12" cy="7" r="4" /><path d="M4 22a8 8 0 0 1 16 0" /></symbol>
+  </defs>
+</svg>
+
 <!-- Page 1: for elderly residents -->
 <section class="page">
-  <div class="band" aria-hidden="true">
-    <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
-  </div>
+  <header class="top-bar">
+    <div class="brand-mark" aria-hidden="true">
+      <svg class="icon" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-shield" /></svg>
+    </div>
+    <div class="brand-name">AttraversiAMO</div>
+    <span class="pill">Comune di Gattapelata</span>
+  </header>
   <div class="content">
     <div class="stack gap-8">
-      <div class="eyebrow">COMUNE DI GATTAPELATA</div>
-      <h1 class="title-xl">Attraversiamo</h1>
+      <div class="eyebrow">Per chi vuole attraversare</div>
+      <h1 class="title-xl">Attraversi<span class="accent">AMO</span></h1>
       <div class="tagline">Nessuno attraversa da solo.</div>
     </div>
 
-    <p class="lead">Nei vicoli del centro storico attraversare può essere pericoloso. Con Attraversiamo basta un tocco sul telefono: una persona del quartiere arriva e ti accompagna dall'altra parte.</p>
+    <p class="lead">Nei vicoli del centro storico attraversare può essere pericoloso. Con AttraversiAMO basta un tocco sul telefono: una persona del quartiere arriva e ti accompagna dall'altra parte.</p>
 
     <div class="stack gap-16">
       <h2>Come funziona</h2>
@@ -210,21 +340,21 @@
         <div class="stack gap-20" style="flex: 1">
           <div class="step">
             <div class="num">1</div>
-            <div class="stack" style="gap: 4px">
+            <div class="stack gap-4">
               <div class="step-title">Inquadra il cartello</div>
               <div class="step-text">All'inizio di ogni vicolo c'è un cartello con un codice QR. Inquadralo con il telefono. Un familiare o il farmacista possono salvarlo per te una volta sola.</div>
             </div>
           </div>
           <div class="step">
             <div class="num">2</div>
-            <div class="stack" style="gap: 4px">
+            <div class="stack gap-4">
               <div class="step-title">Premi il pulsante</div>
               <div class="step-text">Si apre una pagina con un solo grande pulsante: «Voglio attraversare». Niente password, niente registrazione.</div>
             </div>
           </div>
           <div class="step">
             <div class="num">3</div>
-            <div class="stack" style="gap: 4px">
+            <div class="stack gap-4">
               <div class="step-title">Aspetta il tuo Angelo</div>
               <div class="step-text">Il telefono ti dice, anche a voce, chi sta arrivando. Quando sei dall'altra parte premi «Sono dall'altra parte».</div>
             </div>
@@ -232,28 +362,47 @@
         </div>
         <div class="phone" aria-hidden="true">
           <div class="phone-notch"></div>
-          <div class="phone-label">Vicolo dei Fabbri</div>
-          <div class="phone-button">VOGLIO ATTRAVERSARE</div>
-          <div class="phone-hint">Tocca una volta</div>
+          <div class="phone-eyebrow">
+            <svg class="icon" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-location" /></svg>
+            Sei qui
+          </div>
+          <div class="phone-title">Vicolo dei Fabbri</div>
+          <div class="phone-button">
+            <svg class="icon icon--large" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-walk" /></svg>
+            Voglio attraversare
+          </div>
+          <div class="phone-read">
+            <svg class="icon" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-volume" /></svg>
+            Leggi ad alta voce
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="box box-tint stack gap-8 push-bottom">
-      <div class="box-title">La tua riservatezza è al sicuro</div>
-      <div class="box-text">Niente registrazione e niente GPS: l'app sa solo da quale vicolo parte la richiesta. Gli attraversamenti vengono contati in forma anonima, per capire quali vicoli rendere più sicuri.</div>
+    <div class="card card--success push-bottom">
+      <div class="card-icon" aria-hidden="true">
+        <svg class="icon" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-shield" /></svg>
+      </div>
+      <div class="stack gap-8">
+        <div class="card-title">La tua riservatezza è al sicuro</div>
+        <div class="card-text">Niente registrazione e niente GPS: l'app sa solo da quale vicolo parte la richiesta. Gli attraversamenti vengono contati in forma anonima, per capire quali vicoli rendere più sicuri.</div>
+      </div>
     </div>
   </div>
 </section>
 
 <!-- Page 2: for volunteers ("Angeli del vicolo") -->
 <section class="page">
-  <div class="band" aria-hidden="true">
-    <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
-  </div>
-  <div class="content">
+  <header class="top-bar">
+    <div class="brand-mark" aria-hidden="true">
+      <svg class="icon" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-shield" /></svg>
+    </div>
+    <div class="brand-name">AttraversiAMO</div>
+    <span class="pill">Comune di Gattapelata</span>
+  </header>
+  <div class="content content--compact">
     <div class="stack gap-8">
-      <div class="eyebrow">ATTRAVERSIAMO · PER CHI VUOLE AIUTARE</div>
+      <div class="eyebrow">Per chi vuole aiutare</div>
       <h1 class="title-l">Diventa un Angelo del vicolo</h1>
     </div>
 
@@ -262,19 +411,16 @@
     <div class="stack gap-16">
       <h2>Come aiuti</h2>
       <div class="steps-row">
-        <div class="step">
-          <div class="num">1</div>
-          <div class="step-title">Ricevi la richiesta</div>
+        <div class="step-tile">
+          <div class="step-head"><div class="num">1</div><div class="step-title">Ricevi la richiesta</div></div>
           <div class="step-text">Il telefono ti avvisa quando qualcuno vicino a te deve attraversare.</div>
         </div>
-        <div class="step">
-          <div class="num">2</div>
-          <div class="step-title">Rispondi «Arrivo»</div>
+        <div class="step-tile">
+          <div class="step-head"><div class="num">2</div><div class="step-title">Rispondi «Arrivo»</div></div>
           <div class="step-text">La persona vede il tuo nome e sa che stai arrivando.</div>
         </div>
-        <div class="step">
-          <div class="num">3</div>
-          <div class="step-title">Accompagnala</div>
+        <div class="step-tile">
+          <div class="step-head"><div class="num">3</div><div class="step-title">Accompagnala</div></div>
           <div class="step-text">Attraversate insieme, fino all'altra parte del vicolo.</div>
         </div>
       </div>
@@ -282,25 +428,24 @@
 
     <div class="points">
       <h2>Ogni aiuto vale Passi</h2>
-      <div class="points-row">
-        <div class="stack gap-8">
-          <div class="points-figure">10 Passi</div>
-          <div class="points-label">per ogni attraversamento completato</div>
-        </div>
-        <div class="stack gap-8">
-          <div class="points-figure">+5 Passi</div>
-          <div class="points-label">se arrivi entro 2 minuti</div>
-        </div>
+      <div class="points-tile">
+        <div class="points-figure">10 Passi</div>
+        <div class="points-label">per ogni attraversamento completato</div>
       </div>
       <div class="points-note">I Passi vengono assegnati quando la persona accompagnata conferma di essere arrivata dall'altra parte.</div>
     </div>
 
-    <div class="box box-tint stack gap-8">
-      <div class="box-title">Angelo del mese</div>
-      <div class="box-text">Ogni mese chi ha raccolto più Passi viene presentato sul sito e sui social del Comune di Gattapelata.</div>
+    <div class="card card--waiting">
+      <div class="card-icon" aria-hidden="true">
+        <svg class="icon" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-person" /></svg>
+      </div>
+      <div class="stack gap-8">
+        <div class="card-title">Angelo del mese</div>
+        <div class="card-text">Ogni mese chi ha raccolto più Passi viene presentato sul sito e sui social del Comune di Gattapelata.</div>
+      </div>
     </div>
 
-    <div class="box cta push-bottom">
+    <div class="cta push-bottom">
       <div class="qr">[QR iscrizione]</div>
       <div class="stack gap-8">
         <div class="cta-title">Iscriviti come Angelo del vicolo</div>

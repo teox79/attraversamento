@@ -54,7 +54,7 @@ I dati sono conteggi anonimi per vicolo.
 
 ### Gamification (volutamente minima)
 
-- **Passi:** 10 per ogni attraversamento completato, più 5 se l'angelo arriva entro 2 minuti. Vengono assegnati solo quando l'anziano conferma di essere arrivato dall'altra parte.
+- **Passi:** 10 per ogni attraversamento completato. Vengono assegnati solo quando l'anziano conferma di essere arrivato dall'altra parte.
 - **Angelo del mese:** chi ha più Passi nel mese viene pubblicato sul sito e sui social del Comune.
 - Non ci sono gradi, badge o altri meccanismi: l'obiettivo è la massima semplicità.
 
