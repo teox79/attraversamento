@@ -693,7 +693,7 @@ function MunicipalityPage() {
           <div className="volunteer-of-month__photo" aria-hidden="true">
             {!volunteerPhotoLoaded && <span>CM</span>}
             <img
-              src={appPath("images/carlo-mandelli.jpg")}
+              src={appPath("images/carlo-mandelli.png")}
               alt=""
               onError={() => setVolunteerPhotoLoaded(false)}
               style={{ display: volunteerPhotoLoaded ? "block" : "none" }}
