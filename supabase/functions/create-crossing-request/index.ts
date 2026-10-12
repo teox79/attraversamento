@@ -1,4 +1,5 @@
 import { createClient } from "jsr:@supabase/supabase-js@2"
+import webpush from "npm:web-push@3.6.7"
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -45,6 +46,9 @@ Deno.serve(async (request) => {
   }
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL")
+  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")
+  const vapidPublicKey = Deno.env.get("VAPID_PUBLIC_KEY")
+  const vapidPrivateKey = Deno.env.get("VAPID_PRIVATE_KEY")
   const publishableKey =
     Deno.env.get("SUPABASE_PUBLISHABLE_KEY") ??
     Deno.env.get("SUPABASE_ANON_KEY")
@@ -81,9 +85,72 @@ Deno.serve(async (request) => {
     )
   }
 
+  let notifiedVolunteerCount = 0
+  if (serviceRoleKey && vapidPublicKey && vapidPrivateKey) {
+    const adminClient = createClient(supabaseUrl, serviceRoleKey, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    })
+    const { data: subscriptions, error: subscriptionsError } = await adminClient
+      .from("push_subscriptions")
+      .select("endpoint, p256dh, auth_secret")
+
+    if (subscriptionsError) {
+      console.error("Impossibile leggere le sottoscrizioni push", subscriptionsError)
+    } else if (subscriptions?.length) {
+      webpush.setVapidDetails(
+        "https://cslcpywrlfwtqqfrlvse.supabase.co",
+        vapidPublicKey,
+        vapidPrivateKey,
+      )
+      const expiredEndpoints: string[] = []
+      const results = await Promise.allSettled(
+        subscriptions.map(async (subscription) => {
+          try {
+            await webpush.sendNotification(
+              {
+                endpoint: subscription.endpoint,
+                keys: {
+                  p256dh: subscription.p256dh,
+                  auth: subscription.auth_secret,
+                },
+              },
+              JSON.stringify({
+                title: "Nuova richiesta di aiuto",
+                body: "Una persona ha chiesto aiuto per attraversare. Apri Passo Sicuro.",
+                url: "/volontari",
+                requestId: data.id,
+              }),
+              { TTL: 60 },
+            )
+          } catch (error) {
+            const statusCode = (error as { statusCode?: number })?.statusCode
+            if (statusCode === 404 || statusCode === 410) {
+              expiredEndpoints.push(subscription.endpoint)
+            }
+            throw error
+          }
+        }),
+      )
+      notifiedVolunteerCount = results.filter((result) => result.status === "fulfilled").length
+      if (expiredEndpoints.length) {
+        await adminClient
+          .from("push_subscriptions")
+          .delete()
+          .in("endpoint", expiredEndpoints)
+      }
+      const failedCount = results.length - notifiedVolunteerCount
+      if (failedCount) {
+        console.error(`Invio push non riuscito per ${failedCount} sottoscrizioni.`)
+      }
+    }
+  } else {
+    console.error("Configurazione Web Push mancante: richiesta salvata senza inviare push.")
+  }
+
   return jsonResponse({
     requestId: data.id,
     status: data.status,
     createdAt: data.created_at,
+    notifiedVolunteerCount,
   }, 201)
 })

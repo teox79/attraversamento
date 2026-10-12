@@ -36,7 +36,7 @@ Esempio di sottoscrizione lato volontario con supabase-js:
       )
       .subscribe()
 
-La migration aggiunge `crossing_requests` alla publication `supabase_realtime`; le modifiche di tabella da sole non attivano una sottoscrizione client. Realtime avvisa i volontari connessi. Per avvisare anche un'app chiusa serve un canale push separato (per esempio Web Push), non una sottoscrizione Realtime.
+La migration aggiunge `crossing_requests` alla publication `supabase_realtime`; le modifiche di tabella da sole non attivano una sottoscrizione client. Realtime avvisa i volontari connessi. Per gli avvisi anche con l'app chiusa è configurato Web Push: ogni volontario deve attivare le notifiche nella pagina delle richieste. Le sottoscrizioni non contengono dati personali; gli endpoint restano accessibili solo alla Edge Function.
 
 ## Ruolo scelto all'avvio
 
@@ -87,9 +87,13 @@ inoltra l'identità anonima autenticata alla RPC `request_crossing`; è la RPC a
 verificare il ruolo, risolvere di nuovo il QR e inserire la riga in
 `crossing_requests`. Non viene usata la service-role key.
 
-Per pubblicarla nel progetto collegato:
+La migration `20261013000000_add_volunteer_push_subscriptions.sql` crea la tabella privata delle sottoscrizioni e la RPC che consente solo ai dispositivi volontario di registrarle. La Edge Function invia una notifica a tutte le sottoscrizioni attive dopo aver salvato la richiesta; le sottoscrizioni scadute vengono rimosse.
+
+Prima di pubblicare la function, configura `VAPID_PUBLIC_KEY` e `VAPID_PRIVATE_KEY` come secrets Supabase. La chiave pubblica corrispondente è incorporata nel client; la chiave privata non deve essere salvata nel repository né nel frontend. Gli endpoint push sono specifici del browser e il permesso va concesso dal volontario. Su iPhone serve installare l'app sulla schermata Home.
+
+Per applicare le migration e pubblicare la function:
 
     supabase functions deploy create-crossing-request
 
-La verifica JWT resta attiva. Prima di usarla, applica anche le migration al
-database con `npm run supabase:toolbox -- push`.
+La verifica JWT resta attiva. Prima di usarle, applica le migration al database
+con `npm run supabase:toolbox -- push` e configura i secrets VAPID.

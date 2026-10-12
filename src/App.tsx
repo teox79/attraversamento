@@ -9,6 +9,7 @@ import {
 import { Camera, Check, CircleHelp, X } from "lucide-react"
 import {
   createCrossingRequest,
+  enableVolunteerPushNotifications,
   findAlleyByQr,
   getRegisteredRole,
   registerDevice,
@@ -260,8 +261,24 @@ const statusContent: Record<RequestStatus, {
   },
 }
 
-function StatusCard({ status }: { status: RequestStatus }) {
+function StatusCard({
+  status,
+  notifiedVolunteerCount,
+}: {
+  status: RequestStatus
+  notifiedVolunteerCount?: number | null
+}) {
   const content = statusContent[status]
+  const waitingTitle =
+    status === "in_attesa" && notifiedVolunteerCount === 0
+      ? "Richiesta registrata."
+      : content.title
+  const waitingSubtitle =
+    status !== "in_attesa" || notifiedVolunteerCount == null
+      ? content.subtitle
+      : notifiedVolunteerCount === 0
+        ? "Nessun volontario ha attivato le notifiche push. Resta qui e chiedi aiuto a qualcuno vicino."
+        : `Abbiamo avvisato ${notifiedVolunteerCount} volontari. Attendi qui: ti aggiorneremo appena qualcuno sarà disponibile.`
   return (
     <section
       className={`status-card status-card--${status}`}
@@ -272,8 +289,8 @@ function StatusCard({ status }: { status: RequestStatus }) {
       </div>
       <div>
         <p className="status-card__label">{content.label}</p>
-        <h2>{content.title}</h2>
-        <p className="status-card__subtitle">{content.subtitle}</p>
+        <h2>{waitingTitle}</h2>
+        <p className="status-card__subtitle">{waitingSubtitle}</p>
       </div>
     </section>
   )
@@ -493,6 +510,7 @@ function VolunteersPage() {
     <main className="page-shell">
       <TopBar title="Richieste vicino a te" />
       <div className="content-shell">
+        <VolunteerPushSetup />
         {selected?.status === "in_arrivo" && (
           <section className="active-mission">
             <div>
@@ -530,6 +548,65 @@ function VolunteersPage() {
         </div>
       </div>
     </main>
+  )
+}
+
+function VolunteerPushSetup() {
+  const [enabled, setEnabled] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [message, setMessage] = useState("")
+
+  useEffect(() => {
+    let active = true
+    if (!("serviceWorker" in navigator)) return
+    navigator.serviceWorker.ready
+      .then((registration) => registration.pushManager.getSubscription())
+      .then((subscription) => {
+        if (active && subscription) setEnabled(true)
+      })
+      .catch(() => {})
+    return () => {
+      active = false
+    }
+  }, [])
+
+  const enable = async () => {
+    setSaving(true)
+    setMessage("")
+    try {
+      await enableVolunteerPushNotifications()
+      setEnabled(true)
+      setMessage("Notifiche attive: riceverai un avviso quando qualcuno chiede aiuto.")
+    } catch (error) {
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "Non è stato possibile attivare le notifiche.",
+      )
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <section className="push-setup" aria-live="polite">
+      <div>
+        <h2>Ricevi le richieste</h2>
+        <p>Attiva le notifiche per essere avvisato anche con l’app chiusa.</p>
+      </div>
+      {!enabled && (
+        <BigButton
+          icon="check"
+          variant="primary"
+          disabled={saving}
+          onClick={() => void enable()}
+        >
+          {saving ? "Attivazione…" : "Attiva notifiche"}
+        </BigButton>
+      )}
+      {message && <p role="status">{message}</p>}
+      {enabled && !message && <p role="status">Notifiche push attive.</p>}
+    </section>
   )
 }
 
@@ -790,6 +867,7 @@ function HomePage({
   const [lookingUpAlley, setLookingUpAlley] = useState(false)
   const [savingRequest, setSavingRequest] = useState(false)
   const [requestStatus, setRequestStatus] = useState<RequestStatus | null>(null)
+  const [notifiedVolunteerCount, setNotifiedVolunteerCount] = useState<number | null>(null)
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [scanError, setScanError] = useState("")
   const handleScan = useCallback(async (value: string) => {
@@ -818,8 +896,15 @@ function HomePage({
     try {
       const request = await createCrossingRequest(selectedAlley.qrToken)
       setRequestStatus(request.status)
+      setNotifiedVolunteerCount(request.notifiedVolunteerCount)
       const content = statusContent[request.status]
-      speak(`${content.title} ${content.subtitle}`)
+      const confirmation =
+        request.status === "in_attesa" && request.notifiedVolunteerCount === 0
+          ? "La richiesta è registrata, ma nessun volontario ha le notifiche attive. Resta qui e chiedi aiuto a qualcuno vicino."
+          : request.status === "in_attesa"
+            ? `Abbiamo avvisato ${request.notifiedVolunteerCount} volontari. Attendi qui.`
+            : `${content.title} ${content.subtitle}`
+      speak(confirmation)
     } catch (error) {
       setScanError(
         error instanceof Error
@@ -842,7 +927,10 @@ function HomePage({
       ) : registeredRole === "anziano" ? (
         <>
           {requestStatus ? (
-            <StatusCard status={requestStatus} />
+            <StatusCard
+              status={requestStatus}
+              notifiedVolunteerCount={notifiedVolunteerCount}
+            />
           ) : selectedAlley ? (
             <>
               <VicoloHeader name={selectedAlley.name} />
