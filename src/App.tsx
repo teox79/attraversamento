@@ -638,9 +638,11 @@ function NotFoundPage() {
       <h1>Passo Sicuro</h1>
       <p>Apri una delle aree del servizio.</p>
       <nav className="route-list" aria-label="Pagine disponibili">
-        <a href="/v/vicolo-dei-gatti">Persona anziana</a>
-        <a href="/angeli">Volontari</a>
-        <a href="/comune">Comune</a>
+        <a href={`${import.meta.env.BASE_URL}v/vicolo-dei-gatti`}>
+          Persona anziana
+        </a>
+        <a href={`${import.meta.env.BASE_URL}angeli`}>Volontari</a>
+        <a href={`${import.meta.env.BASE_URL}comune`}>Comune</a>
       </nav>
     </main>
   )
@@ -767,7 +769,11 @@ function PwaInstallControl() {
 }
 
 export default function App() {
-  const path = window.location.pathname
+  // BASE_URL is "/" locally and "/attraversamento/" on GitHub Pages.
+  const path = window.location.pathname.replace(
+    import.meta.env.BASE_URL.replace(/\/$/, ""),
+    "",
+  )
   let page: ReactNode
   if (path.startsWith("/v/")) page = <ElderPage />
   else if (path === "/angeli") page = <VolunteersPage />
