@@ -1,4 +1,17 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react"
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react"
+import { Camera, Check, CircleHelp, X } from "lucide-react"
+import {
+  getRegisteredRole,
+  registerDevice,
+  type DeviceRole,
+} from "./lib/supabase"
 
 type RequestStatus = "in_attesa" | "in_arrivo" | "completata"
 type IconName = "walk" | "volume" | "clock" | "person" | "check" | "warning" | "location" | "arrow" | "shield" | "chart"
@@ -631,17 +644,208 @@ function MunicipalityPage() {
   )
 }
 
-function NotFoundPage() {
+function QrScanner({
+  onClose,
+  onScan,
+}: {
+  onClose: () => void
+  onScan: (value: string) => void
+}) {
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const [cameraError, setCameraError] = useState("")
+  const [cameraStarting, setCameraStarting] = useState(true)
+
+  useEffect(() => {
+    const video = videoRef.current
+    if (!video) return
+
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setCameraError(
+        "La fotocamera non è disponibile. Apri Passo Sicuro con una connessione HTTPS o da localhost.",
+      )
+      return
+    }
+
+    let active = true
+    let foundCode = false
+    let controls: { stop: () => void } | undefined
+    let reader: { reset: () => void } | undefined
+
+    import("@zxing/browser")
+      .then(({ BrowserQRCodeReader }) => {
+        if (!active) return
+        const qrReader = new BrowserQRCodeReader()
+        reader = qrReader
+        return qrReader.decodeFromConstraints(
+          { audio: false, video: { facingMode: { ideal: "environment" } } },
+          video,
+          (result) => {
+            if (!active || foundCode || !result) return
+            foundCode = true
+            onScan(result.getText())
+            controls?.stop()
+          },
+        )
+      })
+      .then((cameraControls) => {
+        if (!cameraControls) return
+        controls = cameraControls
+        setCameraStarting(false)
+        if (!active) cameraControls.stop()
+      })
+      .catch(() => {
+        if (active) {
+          setCameraStarting(false)
+          setCameraError(
+            "Non riesco ad aprire la fotocamera. Controlla i permessi del browser e riprova.",
+          )
+        }
+      })
+
+    return () => {
+      active = false
+      controls?.stop()
+      reader?.reset()
+    }
+  }, [onScan])
+
+  return (
+    <div className="scanner-backdrop" role="presentation">
+      <section
+        className="scanner-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="scanner-title"
+      >
+        <button
+          className="scanner-close"
+          type="button"
+          onClick={onClose}
+          aria-label="Chiudi fotocamera"
+        >
+          <X aria-hidden="true" />
+        </button>
+        <div className="scanner-dialog__heading">
+          <Camera aria-hidden="true" />
+          <div>
+            <p className="eyebrow">Passo Sicuro</p>
+            <h2 id="scanner-title">Inquadra il QR del vicolo</h2>
+          </div>
+        </div>
+        {cameraError ? (
+          <div className="scanner-error" role="alert">
+            <CircleHelp aria-hidden="true" />
+            <p>{cameraError}</p>
+          </div>
+        ) : (
+          <div className="scanner-preview">
+            <video ref={videoRef} muted playsInline aria-label="Fotocamera" />
+            <div className="scanner-frame" aria-hidden="true" />
+            {cameraStarting && (
+              <p className="scanner-starting" role="status">
+                Avvio della fotocamera…
+              </p>
+            )}
+          </div>
+        )}
+        <p className="scanner-dialog__hint">
+          La fotocamera serve solo a leggere il codice. Non scattiamo né
+          salviamo immagini.
+        </p>
+      </section>
+    </div>
+  )
+}
+
+function HomePage({
+  registeringRole,
+  registrationError,
+  registeredRole,
+  checkingRegistration,
+  onSelectRole,
+}: {
+  registeringRole: DeviceRole | null
+  registrationError: string
+  registeredRole: DeviceRole | null
+  checkingRegistration: boolean
+  onSelectRole: (role: DeviceRole, destination: string) => void
+}) {
+  const [scannerOpen, setScannerOpen] = useState(false)
+  const [scannedQr, setScannedQr] = useState("")
+  const handleScan = useCallback((value: string) => {
+    setScannedQr(value)
+    setScannerOpen(false)
+  }, [])
+
   return (
     <main className="page-shell centered-page">
       <Icon name="shield" size="large" />
       <h1>Passo Sicuro</h1>
-      <p>Apri una delle aree del servizio.</p>
-      <nav className="route-list" aria-label="Pagine disponibili">
-        <a href="/v/vicolo-dei-gatti">Persona anziana</a>
-        <a href="/angeli">Volontari</a>
-        <a href="/comune">Comune</a>
-      </nav>
+      {checkingRegistration ? (
+        <p role="status">Controllo della registrazione…</p>
+      ) : registeredRole === "anziano" ? (
+        <>
+          <p>Per chiedere aiuto, scansiona il QR del vicolo.</p>
+          <button
+            className="camera-button"
+            type="button"
+            onClick={() => {
+              setScannedQr("")
+              setScannerOpen(true)
+            }}
+          >
+            <Camera aria-hidden="true" className="camera-button__icon" />
+            <span>Scansiona il QR</span>
+            <span className="camera-button__hint">Apri la fotocamera</span>
+          </button>
+          {scannedQr && (
+            <p className="scan-result" role="status">
+              <Check aria-hidden="true" /> QR letto. Codice: {scannedQr}
+            </p>
+          )}
+        </>
+      ) : registeredRole === "volontario" ? (
+        <>
+          <p>Il dispositivo è registrato come volontario.</p>
+          <button
+            className="camera-button camera-button--volunteer"
+            type="button"
+            onClick={() => window.location.assign("/angeli")}
+          >
+            <Icon name="person" size="large" />
+            <span>Apri le richieste</span>
+          </button>
+        </>
+      ) : (
+        <>
+          <p>Apri una delle aree del servizio.</p>
+          <nav className="route-list" aria-label="Pagine disponibili">
+            <button
+              type="button"
+              onClick={() => onSelectRole("anziano", "/v/vicolo-dei-gatti")}
+              disabled={registeringRole !== null}
+            >
+              {registeringRole === "anziano" ? "Registrazione…" : "Persona anziana"}
+            </button>
+            <button
+              type="button"
+              onClick={() => onSelectRole("volontario", "/angeli")}
+              disabled={registeringRole !== null}
+            >
+              {registeringRole === "volontario" ? "Registrazione…" : "Volontari"}
+            </button>
+          </nav>
+        </>
+      )}
+      <a className="home-municipality-link" href="/comune">Comune</a>
+      {registrationError && (
+        <p className="registration-message" role="alert">
+          {registrationError}
+        </p>
+      )}
+      {scannerOpen && (
+        <QrScanner onClose={() => setScannerOpen(false)} onScan={handleScan} />
+      )}
     </main>
   )
 }
@@ -768,11 +972,67 @@ function PwaInstallControl() {
 
 export default function App() {
   const path = window.location.pathname
+  const [registeringRole, setRegisteringRole] = useState<DeviceRole | null>(null)
+  const [registrationError, setRegistrationError] = useState("")
+  const [registeredRole, setRegisteredRole] = useState<DeviceRole | null>(null)
+  const [checkingRegistration, setCheckingRegistration] = useState(path === "/")
+
+  useEffect(() => {
+    if (path !== "/") return
+    let active = true
+    getRegisteredRole()
+      .then((role) => {
+        if (active) setRegisteredRole(role)
+      })
+      .catch((error) => {
+        if (active) {
+          setRegistrationError(
+            error instanceof Error
+              ? error.message
+              : "Non riesco a controllare la registrazione. Riprova.",
+          )
+        }
+      })
+      .finally(() => {
+        if (active) setCheckingRegistration(false)
+      })
+    return () => {
+      active = false
+    }
+  }, [path])
+
+  const selectRole = async (role: DeviceRole, destination: string) => {
+    setRegistrationError("")
+    setRegisteringRole(role)
+    try {
+      await registerDevice(role)
+      setRegisteredRole(role)
+      window.location.assign(destination)
+    } catch (error) {
+      setRegistrationError(
+        error instanceof Error
+          ? error.message
+          : "Non è stato possibile registrare il dispositivo. Riprova.",
+      )
+      setRegisteringRole(null)
+    }
+  }
+
   let page: ReactNode
   if (path.startsWith("/v/")) page = <ElderPage />
   else if (path === "/angeli") page = <VolunteersPage />
   else if (path === "/comune") page = <MunicipalityPage />
-  else page = <NotFoundPage />
+  else {
+    page = (
+      <HomePage
+        registeringRole={registeringRole}
+        registrationError={registrationError}
+        registeredRole={registeredRole}
+        checkingRegistration={checkingRegistration}
+        onSelectRole={selectRole}
+      />
+    )
+  }
 
   return (
     <>
