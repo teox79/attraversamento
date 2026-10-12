@@ -235,8 +235,8 @@ const statusContent: Record<RequestStatus, {
   in_attesa: {
     icon: "clock",
     label: "Richiesta inviata",
-    title: "Stiamo chiamando un aiuto.",
-    subtitle: "Resta qui.",
+    title: "Abbiamo avvisato i volontari.",
+    subtitle: "Attendi qui: ti aggiorneremo appena qualcuno sarà disponibile.",
   },
   in_arrivo: {
     icon: "person",
