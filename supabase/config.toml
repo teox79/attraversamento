@@ -1,0 +1,7 @@
+project_id = "cslcpywrlfwtqqfrlvse"
+
+[auth]
+enable_anonymous_sign_ins = true
+
+[functions.create-crossing-request]
+verify_jwt = true

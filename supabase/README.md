@@ -78,3 +78,18 @@ Per applicare una migration dopo averla esaminata:
     npm run supabase:toolbox -- push
 
 Le tabelle `devices` e `crossing_requests` hanno RLS attiva. Le viste statistiche espongono solo aggregati ai client autenticati; la tabella delle richieste resta accessibile solo secondo le policy indicate.
+
+## Richiesta di attraversamento
+
+Quando una persona anziana legge il QR, l'app risolve il token in `alleys` e,
+dopo la conferma, chiama la Edge Function `create-crossing-request`. La function
+inoltra l'identità anonima autenticata alla RPC `request_crossing`; è la RPC a
+verificare il ruolo, risolvere di nuovo il QR e inserire la riga in
+`crossing_requests`. Non viene usata la service-role key.
+
+Per pubblicarla nel progetto collegato:
+
+    supabase functions deploy create-crossing-request
+
+La verifica JWT resta attiva. Prima di usarla, applica anche le migration al
+database con `npm run supabase:toolbox -- push`.

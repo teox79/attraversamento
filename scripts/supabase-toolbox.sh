@@ -48,6 +48,15 @@ require_cli() {
   SUPABASE_CLI="$cli"
 }
 
+run_supabase_cli() {
+  require_cli
+  "$SUPABASE_CLI" --agent no "$@"
+}
+
+run_login() {
+  run_supabase_cli login
+}
+
 project_ref() {
   if [[ -n "${SUPABASE_PROJECT_REF:-}" ]]; then
     printf '%s' "$SUPABASE_PROJECT_REF"
@@ -72,22 +81,25 @@ confirm() {
   if [[ "${YES:-0}" == 1 ]]; then return 0; fi
   printf '\n%s\n' "$message"
   read -r -p '[E]segui / [A]nnulla: ' answer || return 1
-  [[ "${answer,,}" == e ]]
+  case "$answer" in
+    E|e) return 0 ;;
+    *) return 1 ;;
+  esac
 }
 
 ensure_linked() {
   local ref linked_ref_file linked_ref
   require_cli
   ref="$(require_project_ref)"
-  if ! "$SUPABASE_CLI" projects list >/dev/null 2>&1; then
+  if ! run_supabase_cli projects list >/dev/null 2>&1; then
     printf '%s\n' 'Accesso CLI Supabase non disponibile; avvio il login.'
-    "$SUPABASE_CLI" login
+    run_login
   fi
   linked_ref_file="$REPO_ROOT/supabase/.temp/project-ref"
   linked_ref=''
   [[ -f "$linked_ref_file" ]] && linked_ref="$(tr -d '[:space:]' < "$linked_ref_file")"
   if [[ "$linked_ref" != "$ref" ]]; then
-    (cd "$REPO_ROOT" && "$SUPABASE_CLI" link --project-ref "$ref")
+    (cd "$REPO_ROOT" && run_supabase_cli link --project-ref "$ref")
   else
     printf '✓ Progetto già collegato: %s\n' "$ref"
   fi
@@ -130,7 +142,7 @@ run_push() {
   [[ "$result" == 2 ]] && return 0
   [[ "$result" == 0 ]] || { printf '%s\n' 'Operazione annullata.'; return 0; }
   ensure_linked
-  (cd "$REPO_ROOT" && "$SUPABASE_CLI" db push)
+  (cd "$REPO_ROOT" && run_supabase_cli db push)
 }
 
 run_new() {
@@ -140,7 +152,7 @@ run_new() {
   [[ "$result" == 2 ]] && return 0
   [[ "$result" == 0 ]] || { printf '%s\n' 'Operazione annullata.'; return 0; }
   require_cli
-  (cd "$REPO_ROOT" && "$SUPABASE_CLI" migration new "$name")
+  (cd "$REPO_ROOT" && run_supabase_cli migration new "$name")
 }
 
 interactive_menu() {
@@ -151,7 +163,7 @@ interactive_menu() {
     read -r -p 'Scelta: ' choice || return 0
     case "$choice" in
       1) show_status ;;
-      2) require_cli; "$SUPABASE_CLI" login ;;
+      2) run_login ;;
       3) ensure_linked ;;
       4) find "$REPO_ROOT/supabase/migrations" -maxdepth 1 -type f -name '*.sql' -print | sort ;;
       5) run_push ;;
@@ -167,7 +179,7 @@ if [[ "${1:-}" == --yes ]]; then YES=1; shift; fi
 case "${1:-}" in
   '') interactive_menu ;;
   status) show_status ;;
-  login) require_cli; "$SUPABASE_CLI" login ;;
+  login) run_login ;;
   link) ensure_linked ;;
   migrations) find "$REPO_ROOT/supabase/migrations" -maxdepth 1 -type f -name '*.sql' -print | sort ;;
   push) shift; [[ "${1:-}" == --dry-run ]] && DRY_RUN=1; [[ "${1:-}" == --yes ]] && YES=1; run_push ;;

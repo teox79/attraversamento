@@ -8,8 +8,11 @@ import {
 } from "react"
 import { Camera, Check, CircleHelp, X } from "lucide-react"
 import {
+  createCrossingRequest,
+  findAlleyByQr,
   getRegisteredRole,
   registerDevice,
+  type AlleyQr,
   type DeviceRole,
 } from "./lib/supabase"
 
@@ -775,11 +778,50 @@ function HomePage({
   onSelectRole: (role: DeviceRole, destination: string) => void
 }) {
   const [scannerOpen, setScannerOpen] = useState(false)
-  const [scannedQr, setScannedQr] = useState("")
-  const handleScan = useCallback((value: string) => {
-    setScannedQr(value)
+  const [selectedAlley, setSelectedAlley] = useState<AlleyQr | null>(null)
+  const [lookingUpAlley, setLookingUpAlley] = useState(false)
+  const [savingRequest, setSavingRequest] = useState(false)
+  const [requestStatus, setRequestStatus] = useState<RequestStatus | null>(null)
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const [scanError, setScanError] = useState("")
+  const handleScan = useCallback(async (value: string) => {
     setScannerOpen(false)
+    setScanError("")
+    setSelectedAlley(null)
+    setLookingUpAlley(true)
+    try {
+      setSelectedAlley(await findAlleyByQr(value))
+    } catch (error) {
+      setScanError(
+        error instanceof Error
+          ? error.message
+          : "Non riesco a riconoscere questo QR. Riprova.",
+      )
+    } finally {
+      setLookingUpAlley(false)
+    }
   }, [])
+
+  const submitCrossingRequest = async () => {
+    if (!selectedAlley) return
+    setSavingRequest(true)
+    setConfirmOpen(false)
+    setScanError("")
+    try {
+      const request = await createCrossingRequest(selectedAlley.qrToken)
+      setRequestStatus(request.status)
+      const content = statusContent[request.status]
+      speak(`${content.title} ${content.subtitle}`)
+    } catch (error) {
+      setScanError(
+        error instanceof Error
+          ? error.message
+          : "Non è stato possibile inviare la richiesta. Riprova.",
+      )
+    } finally {
+      setSavingRequest(false)
+    }
+  }
 
   return (
     <main className="page-shell centered-page">
@@ -789,24 +831,52 @@ function HomePage({
         <p role="status">Controllo della registrazione…</p>
       ) : registeredRole === "anziano" ? (
         <>
-          <p>Per chiedere aiuto, scansiona il QR del vicolo.</p>
-          <button
-            className="camera-button"
-            type="button"
-            onClick={() => {
-              setScannedQr("")
-              setScannerOpen(true)
-            }}
-          >
-            <Camera aria-hidden="true" className="camera-button__icon" />
-            <span>Scansiona il QR</span>
-            <span className="camera-button__hint">Apri la fotocamera</span>
-          </button>
-          {scannedQr && (
-            <p className="scan-result" role="status">
-              <Check aria-hidden="true" /> QR letto. Codice: {scannedQr}
-            </p>
+          {requestStatus ? (
+            <StatusCard status={requestStatus} />
+          ) : selectedAlley ? (
+            <>
+              <VicoloHeader name={selectedAlley.name} />
+              <BigButton
+                icon="walk"
+                size="XL"
+                disabled={savingRequest}
+                onClick={() => setConfirmOpen(true)}
+              >
+                {savingRequest ? "Invio richiesta…" : "Chiedi aiuto"}
+              </BigButton>
+              <button
+                className="read-button"
+                type="button"
+                onClick={() => setSelectedAlley(null)}
+              >
+                Scansiona un altro vicolo
+              </button>
+            </>
+          ) : (
+            <>
+              <p>Per chiedere aiuto, scansiona il QR del vicolo.</p>
+              <button
+                className="camera-button"
+                type="button"
+                onClick={() => {
+                  setScanError("")
+                  setScannerOpen(true)
+                }}
+                disabled={lookingUpAlley}
+              >
+                <Camera aria-hidden="true" className="camera-button__icon" />
+                <span>Scansiona il QR</span>
+                <span className="camera-button__hint">Apri la fotocamera</span>
+              </button>
+              {lookingUpAlley && <p role="status">Cerco il vicolo…</p>}
+            </>
           )}
+          {scanError && <p className="registration-message" role="alert">{scanError}</p>}
+          <ConfirmDialog
+            open={confirmOpen}
+            onYes={() => void submitCrossingRequest()}
+            onNo={() => setConfirmOpen(false)}
+          />
         </>
       ) : registeredRole === "volontario" ? (
         <>
@@ -827,7 +897,7 @@ function HomePage({
             <button
               type="button"
               onClick={() =>
-                onSelectRole("anziano", appPath("v/vicolo-dei-gatti"))
+                onSelectRole("anziano", appPath(""))
               }
               disabled={registeringRole !== null}
             >
