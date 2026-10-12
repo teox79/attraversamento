@@ -6,7 +6,7 @@ import {
   useState,
   type ReactNode,
 } from "react"
-import { Award, Camera, Check, CircleHelp, Footprints, X } from "lucide-react"
+import { Camera, Check, CircleHelp, X } from "lucide-react"
 import {
   createCrossingRequest,
   enableVolunteerPushNotifications,
@@ -641,8 +641,6 @@ const riskyAlleys = [
 ]
 
 function MunicipalityPage() {
-  const [volunteerPhotoLoaded, setVolunteerPhotoLoaded] = useState(true)
-
   return (
     <main className="page-shell dashboard">
       <TopBar
@@ -687,29 +685,6 @@ function MunicipalityPage() {
             variation="2 nuove oggi"
             tone="red"
           />
-        </section>
-
-        <section className="volunteer-of-month" aria-labelledby="volunteer-of-month-title">
-          <div className="volunteer-of-month__photo" aria-hidden="true">
-            {!volunteerPhotoLoaded && <span>CM</span>}
-            <img
-              src={appPath("images/carlo-mandelli.png")}
-              alt=""
-              onError={() => setVolunteerPhotoLoaded(false)}
-              style={{ display: volunteerPhotoLoaded ? "block" : "none" }}
-            />
-          </div>
-          <div className="volunteer-of-month__details">
-            <p className="eyebrow"><Award aria-hidden="true" /> Volontario del mese</p>
-            <h2 id="volunteer-of-month-title">Carlo Mandelli</h2>
-            <p className="volunteer-of-month__role">Grazie per il tuo impegno!</p>
-            <div className="volunteer-of-month__score">
-              <Footprints aria-hidden="true" />
-              <strong>12.480</strong>
-              <span>passi questo mese</span>
-            </div>
-            <p className="volunteer-of-month__note">Punteggio dimostrativo</p>
-          </div>
         </section>
 
         <section className="risk-section">
