@@ -55,7 +55,7 @@ I dati sono conteggi anonimi per vicolo.
 ### Gamification (volutamente minima)
 
 - **Passi:** 10 per ogni attraversamento completato. Vengono assegnati solo quando l'anziano conferma di essere arrivato dall'altra parte.
-- **Volontario del mese:** chi ha più Passi nel mese viene pubblicato sul sito e sui social del Comune.
+- **Volontario del mese:** chi raccoglie più Passi nel mese riceve una notifica sul proprio telefono con i ringraziamenti del Comune.
 - Non ci sono gradi, badge o altri meccanismi: l'obiettivo è la massima semplicità.
 
 ### Privacy
